@@ -179,6 +179,8 @@ public class GameView extends View {
             int dy = getMeasuredHeight() / mStatus.length;
             mGridWidth = Math.min(dx, dy);
             mPathWidth = mGridWidth - 4;
+            bluePaint.setStrokeWidth(mPathWidth / 2);
+            bluePaint.setPathEffect(new CornerPathEffect(mPathWidth / 2));
         }
     }
 
@@ -209,6 +211,9 @@ public class GameView extends View {
             }
         }
 
+        //draw line
+
+
 
         //draw path
 //        for (int i = 0; i < mPointList.size() - 1; i++) {
@@ -230,6 +235,10 @@ public class GameView extends View {
         }
 
         canvas.drawPath(mPointPath, bluePaint);
+
+        //draw start point and end point
+        // canvas.drawCircle((mStartX + 0.5f) * mGridWidth, (mStartY + 0.5f) * mGridWidth, mPathWidth / 2 + 1, bluePaint);
+        canvas.drawCircle((mCurrentX + 0.5f) * mGridWidth, (mCurrentY + 0.5f) * mGridWidth, mPathWidth / 2 + 1, bluePaint);
 
 
     }
