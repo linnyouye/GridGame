@@ -21,6 +21,10 @@ public class GameView extends View {
     private static final String TAG = "lyy-GameView";
     private static final boolean D = true;
 
+    private static final int DIRECTION_UP = 1;
+    private static final int DIRECTION_DOWN = 2;
+    private static final int DIRECTION_LEFT = 3;
+    private static final int DIRECTION_RIGHT = 4;
 
     private Context mContext;
     private OnGameFinishedListener mListener;
@@ -32,6 +36,8 @@ public class GameView extends View {
     private int mCurrentY;
     private int mMaxX;
     private int mMaxY;
+    private float mPositionX;
+    private float mPositionY;
     private int mGridWidth;
     private int mPathWidth;
 
@@ -127,15 +133,15 @@ public class GameView extends View {
 
         if (Math.abs(dx) > Math.abs(dy)) {
             if (dx > 0) {
-                goRight();
+                go(DIRECTION_RIGHT);
             } else {
-                goLeft();
+                go(DIRECTION_LEFT);
             }
         } else {
             if (dy > 0) {
-                goDown();
+                go(DIRECTION_DOWN);
             } else {
-                goUp();
+                go(DIRECTION_UP);
             }
         }
 
@@ -165,6 +171,7 @@ public class GameView extends View {
         mCurrentX = startX;
         mCurrentY = startY;
 
+
         mPointList.add(new Point(startX, startY));
 
         invalidate();
@@ -181,6 +188,11 @@ public class GameView extends View {
             mPathWidth = mGridWidth - 4;
             bluePaint.setStrokeWidth(mPathWidth / 2);
             bluePaint.setPathEffect(new CornerPathEffect(mPathWidth / 2));
+
+            mPositionX = (mCurrentX + 0.5f) * mGridWidth;
+            mPositionY = (mCurrentY + 0.5f) * mGridWidth;
+
+            invalidate();
         }
     }
 
@@ -214,7 +226,6 @@ public class GameView extends View {
         //draw line
 
 
-
         //draw path
 //        for (int i = 0; i < mPointList.size() - 1; i++) {
 //            Point startPoint = mPointList.get(i);
@@ -223,37 +234,27 @@ public class GameView extends View {
 //        }
 
         mPointPath.reset();
-        for (int i = 0; i < mPointList.size(); i++) {
+        for (int i = 0; i < mPointList.size() - 1; i++) {
             Point point = mPointList.get(i);
             if (i == 0) {
                 mPointPath.moveTo((point.x + 0.5f) * dx, (point.y + 0.5f) * dy);
             } else {
                 mPointPath.lineTo((point.x + 0.5f) * dx, (point.y + 0.5f) * dy);
             }
-
-
         }
+        mPointPath.lineTo(mPositionX, mPositionY);
 
         canvas.drawPath(mPointPath, bluePaint);
 
         //draw start point and end point
         // canvas.drawCircle((mStartX + 0.5f) * mGridWidth, (mStartY + 0.5f) * mGridWidth, mPathWidth / 2 + 1, bluePaint);
-        canvas.drawCircle((mCurrentX + 0.5f) * mGridWidth, (mCurrentY + 0.5f) * mGridWidth, mPathWidth / 2 + 1, bluePaint);
+        canvas.drawCircle(mPositionX, mPositionY, mPathWidth / 4 + 1, bluePaint);
 
 
     }
 
     private boolean isStatusValid() {
-        if (mStatus == null) {
-            return false;
-        }
-        if (mStatus.length == 0) {
-            return false;
-        }
-        if (mStatus[0].length == 0) {
-            return false;
-        }
-        return true;
+        return mStatus != null && mStatus.length > 0 && mStatus[0].length > 0;
     }
 
     private boolean goLeft() {
@@ -267,7 +268,6 @@ public class GameView extends View {
                 mCurrentX--;
             }
             mPointList.add(new Point(mCurrentX, mCurrentY));
-            invalidate();
             return true;
         }
     }
@@ -283,7 +283,6 @@ public class GameView extends View {
                 mCurrentY++;
             }
             mPointList.add(new Point(mCurrentX, mCurrentY));
-            invalidate();
             return true;
         }
     }
@@ -299,7 +298,6 @@ public class GameView extends View {
                 mCurrentX++;
             }
             mPointList.add(new Point(mCurrentX, mCurrentY));
-            invalidate();
             return true;
         }
     }
@@ -315,7 +313,6 @@ public class GameView extends View {
                 mCurrentY--;
             }
             mPointList.add(new Point(mCurrentX, mCurrentY));
-            invalidate();
             return true;
         }
     }
@@ -331,8 +328,77 @@ public class GameView extends View {
         return true;
     }
 
+    public boolean go(int direction) {
+        boolean result = false;
+        switch (direction) {
+            case DIRECTION_DOWN:
+                result = goDown();
+                break;
+            case DIRECTION_UP:
+                result = goUp();
+                break;
+            case DIRECTION_LEFT:
+                result = goLeft();
+                break;
+            case DIRECTION_RIGHT:
+                result = goRight();
+                break;
+            default:
+                break;
+        }
+        if (result) {
+            post(new TranslateRunnable((mCurrentX + 0.5f) * mGridWidth, (mCurrentY + 0.5f) * mGridWidth));
+        }
+
+        return result;
+    }
+
+
     interface OnGameFinishedListener {
         public void onGameFinished(boolean isWon);
+    }
+
+    class TranslateRunnable implements Runnable {
+
+        private static final int DIVIDER = 20;
+        private static final int DURATION = 10;
+        private float targetX;
+        private float targetY;
+        private int dividerX;
+        private int dividerY;
+
+        public TranslateRunnable(float x, float y) {
+
+            Log.i(TAG, "TranslateRunnable x:" + x + ",y:" + y);
+
+            targetX = x;
+            targetY = y;
+            dividerX = targetX - mPositionX > 0 ? DIVIDER : -DIVIDER;
+            dividerY = targetY - mPositionY > 0 ? DIVIDER : -DIVIDER;
+
+        }
+
+        @Override
+        public void run() {
+            if (targetY == mPositionY && targetX == mPositionX) {
+                return;
+            }
+            if (Math.abs(targetX - mPositionX) < DIVIDER) {
+                mPositionX = targetX;
+            } else {
+                mPositionX += dividerX;
+            }
+            if (Math.abs(targetY - mPositionY) < DIVIDER) {
+                mPositionY = targetY;
+            } else {
+                mPositionY += dividerY;
+            }
+            invalidate();
+            postDelayed(this, DURATION);
+            Log.i(TAG, "run x:" + mPositionX + ",y:" + mPositionY);
+
+
+        }
     }
 
 }

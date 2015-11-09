@@ -9,9 +9,14 @@ public class GameActivity extends BaseActivity {
     private GameView mGameView;
 
     private int[][] state = new int[][]{
-            {1, 1, 1, 1, -1}, {1, 1, 1, 1, 1},
-            {1, 1, 1, -1, 1}, {-1, 1, 1, 1, 1},
-            {1, 1, -1, 1, 1}};
+            {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1},
+            {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1},
+            {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1},
+            {1, 1, 1, 1, -1, 1, 1}, {1, 1, 1, 1, 1, 1, 1},
+            {1, 1, 1, -1, 1, 1, 1}, {1, 1, 1, -1, 1, 1, 1},
+            {1, 1, 1, -1, 1, 1, 1}, {1, 1, 1, -1, 1, 1, 1},
+            {1, 1, 1, -1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1},
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +24,7 @@ public class GameActivity extends BaseActivity {
         setContentView(R.layout.activity_game);
 
         mGameView = (GameView) findViewById(R.id.gameView);
-        mGameView.initStatus(state, 1, 1);
+        mGameView.initStatus(state, 2, 2);
     }
 
 }
