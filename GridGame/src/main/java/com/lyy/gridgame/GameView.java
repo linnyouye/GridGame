@@ -158,7 +158,7 @@ public class GameView extends View {
         bluePaint.setStrokeWidth(mPathWidth);
         bluePaint.setAntiAlias(true);
         bluePaint.setStyle(Paint.Style.STROKE);
-        bluePaint.setColor(0xff3366ff);
+        bluePaint.setColor(0x663366ff);
         bluePaint.setPathEffect(new CornerPathEffect(mPathWidth / 2));
     }
 
@@ -186,8 +186,8 @@ public class GameView extends View {
             int dy = getMeasuredHeight() / mStatus.length;
             mGridWidth = Math.min(dx, dy);
             mPathWidth = mGridWidth - 4;
-            bluePaint.setStrokeWidth(mPathWidth / 2);
-            bluePaint.setPathEffect(new CornerPathEffect(mPathWidth / 2));
+            bluePaint.setStrokeWidth(mPathWidth / 1.2f);
+            bluePaint.setPathEffect(new CornerPathEffect(5));
 
             mPositionX = (mCurrentX + 0.5f) * mGridWidth;
             mPositionY = (mCurrentY + 0.5f) * mGridWidth;
@@ -224,6 +224,13 @@ public class GameView extends View {
         }
 
         //draw line
+        for (int i = 0; i <= mMaxX + 1; i++) {
+            canvas.drawLine(i * mGridWidth, 0, i * mGridWidth, (mMaxY + 1) * mGridWidth, redPaint);
+        }
+
+        for (int i = 0; i <= mMaxY + 1; i++) {
+            canvas.drawLine(0, i * mGridWidth, (mMaxX + 1) * mGridWidth, i * mGridWidth, redPaint);
+        }
 
 
         //draw path
