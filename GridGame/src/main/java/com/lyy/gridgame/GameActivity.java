@@ -8,7 +8,7 @@ public class GameActivity extends BaseActivity {
 
     private GameView mGameView;
 
-    //test 1
+    //test
 
     private int[][] state = new int[][]{
             {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1},
